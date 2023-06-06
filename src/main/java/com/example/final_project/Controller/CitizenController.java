@@ -1,18 +1,19 @@
 package com.example.final_project.Controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.*;
 import com.example.final_project.repo.Citizen;
 import com.example.final_project.repo.CitizenRepository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@RequestMapping("/api")
 @RestController
 public class CitizenController {
 
@@ -24,17 +25,20 @@ public class CitizenController {
         return "index";
     }
 
-    @GetMapping("/citizens")
+    @GetMapping("/getcitizens")
     public List<Citizen> getCitizens() {
-        System.out.println("Getting citizens");
         return repository.findAll();
     }
 
-    @PostMapping("/citizens")
-    public Citizen addCitizen(@Valid @RequestBody Citizen citizen, BindingResult result) {
+    @PostMapping("/addcitizen")
+    public ResponseEntity<?> addCitizen(@Valid @RequestBody Citizen citizen, BindingResult result) {
         if(result.hasErrors()) {
-            // Handle validation errors here
+            List<String> errors = result.getAllErrors().stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .collect(Collectors.toList());
+            return ResponseEntity.badRequest().body(errors);
         }
-        return repository.save(citizen);
+        repository.save(citizen);
+        return ResponseEntity.ok().build();
     }
 }
