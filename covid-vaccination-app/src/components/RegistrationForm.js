@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import data from "bootstrap/js/src/dom/data";
+import axios from "axios";
 
 const initialFormData = {
     firstName: '',
@@ -20,6 +20,57 @@ const initialFormData = {
 const RegistrationForm = () => {
 
     const [formData, setFormData] = useState(initialFormData);
+    const [countryOptions, setCountryOptions] = useState([]);
+    const [cityOptions, setCityOptions] = useState([]);
+    const [selectedCountry, setSelectedCountry] = useState('');
+
+
+    useEffect(() => {
+        const fetchCountryOptions = async () => {
+            try {
+                const response = await axios.get(
+                    'http://api.geonames.org/countryInfoJSON?lang=en&username=avigailhagay'
+                );
+                setCountryOptions(response.data.geonames);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        fetchCountryOptions();
+    }, []);
+
+    const handleCountryChange = (e) => {
+        if(e.target.value !== 'Select a country')
+            setSelectedCountry(e.target.value);
+        else
+            setSelectedCountry('');
+    };
+
+    useEffect(() => {
+        if(selectedCountry === ''){
+            setCityOptions([]);
+            return;
+        }
+        const fetchCityOptions = async () => {
+            try {
+                const response = await axios.get(
+                    `http://api.geonames.org/searchJSON?country=${selectedCountry}&lang=en&username=avigailhagay`
+                );
+                const uniqueCities = Array.from(
+                    new Set(response.data.geonames.map(city => city.name))
+                );          const sortedCities = uniqueCities.sort((a, b) =>
+                    a.localeCompare(b)
+                );      setCityOptions(sortedCities);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        if (selectedCountry) {
+            fetchCityOptions();
+        }
+    }, [selectedCountry]);
 
     const handleChange = (e) => {
         if (e.target.name === 'preexistingConditions') {
@@ -85,9 +136,32 @@ const RegistrationForm = () => {
                     <input type="text" name="address" onChange={handleChange} className="form-control" />
                 </div>
                 <div className="col-md-6">
-                    <label className="form-label">City:</label>
-                    <input type="text" name="city" onChange={handleChange} className="form-control" />
+                    <label className="form-label">Country:</label>
+                    <select name="country" value={selectedCountry} onChange={handleCountryChange} className="form-control">
+                        <option value="">Select a country</option>
+                        {countryOptions.map(country => (
+                            <option key={country.countryCode} value={country.countryCode}>{country.countryName}</option>
+                        ))}
+                    </select>
                 </div>
+                <div className="col-md-6">
+                    <label className="form-label">City:</label>
+                    <select name="city" onChange={handleChange} className="form-control">
+                        {cityOptions.length === 0 ? (
+                            <>
+                                <option value="">Please select a country first</option>
+                            </>
+                        ) : (
+                            <>
+                                <option value="">Select a city</option>
+                                {cityOptions.map((city, index) => (
+                                    <option key={index} value={city}>{city}</option>
+                                ))}
+                            </>
+                        )}
+                    </select>
+                </div>
+
                 <div className="col-md-6">
                     <label className="form-label">Zip Code:</label>
                     <input type="text" name="zipCode" onChange={handleChange} className="form-control" />
