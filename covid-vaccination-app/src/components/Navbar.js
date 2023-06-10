@@ -14,14 +14,14 @@ export default function Navbar() {
          */
         <nav className={'nav'}>
             <a href={'/'} className={'site-title'}>
-                Covid Vaccination App
+                <h4>Covid Vaccination App</h4>
             </a>
             <ul>
                 <li className={'active'}>
-                    <a href={'/register'}>Register</a>
+                    <a href={'/register'}><h5>Register</h5></a>
                 </li>
                 <li>
-                    <a href={'/summary'}>Summary</a>
+                    <a href={'/summary'}><h5>Summary</h5></a>
                 </li>
             </ul>
         </nav>
