@@ -24,6 +24,8 @@ const RegistrationForm = () => {
     const [countryOptions, setCountryOptions] = useState([]);
     const [cityOptions, setCityOptions] = useState([]);
     const [selectedCountry, setSelectedCountry] = useState('');
+    const [otherCondition, setOtherCondition] = useState(false);
+    const [otherConditionValue, setOtherConditionValue] = useState('');
     const [error, setError] = useState(null);
 
 
@@ -76,11 +78,12 @@ const RegistrationForm = () => {
 
     const handleChange = (e) => {
         if (e.target.name === 'preexistingConditions') {
-            if (e.target.checked) {
+            if (e.target.checked && e.target.value !== 'Other') {
                 setFormData({
                     ...formData,
                     preexistingConditions: [...formData.preexistingConditions, e.target.value]
                 });
+
             } else {
                 setFormData({
                     ...formData,
@@ -116,6 +119,24 @@ const RegistrationForm = () => {
             })
             .then(error =>setError(error))
             .catch(error => setError(error))
+    }
+
+    const handleOtherConditionChange = (e) => {
+        setOtherCondition(e.target.checked);
+    };
+
+    const handleOtherConditionTextChange = (e) => {
+        setOtherConditionValue(e.target.value);
+    }
+
+    const handleOtherConditionAdd = (e) => {
+        if (otherConditionValue !== '') {
+            setFormData({
+                ...formData,
+                preexistingConditions: [...formData.preexistingConditions, otherConditionValue]
+            });
+            setOtherConditionValue('');
+        }
     }
 
     return (
@@ -218,9 +239,23 @@ const RegistrationForm = () => {
                             <label className="form-check-label">HIV</label>
                         </div>
                         <div className="form-check">
-                            <input type="checkbox" value="Other" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
+                            <input type="checkbox" value="Other" name="preexistingConditions" onChange={handleOtherConditionChange} className="form-check-input" />
                             <label className="form-check-label">Other</label>
                         </div>
+                        {otherCondition && (
+                            <div className="form-group">
+                                <label htmlFor="otherCondition">Please specify:</label>
+                                <input
+                                    type="text"
+                                    id="otherCondition"
+                                    name="otherCondition"
+                                    value={otherConditionValue} // add this line
+                                    onChange={handleOtherConditionTextChange} // add this line
+                                    className="form-control"
+                                />
+                                <button type="button" className="btn btn-danger btn-sm mt-2" onClick={handleOtherConditionAdd}>Add</button>
+                            </div>
+                        )}
                     </div>
                     <div className="col-12">
                         <button type="submit" className="btn">Submit</button>
