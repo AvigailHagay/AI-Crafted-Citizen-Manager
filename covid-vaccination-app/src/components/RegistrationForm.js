@@ -1,5 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '../style/css/RegistrationForm.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faCalendar, faMapMarkerAlt, faGlobe, faCity, faEnvelope, faPhone, faVirus, faHeartbeat  } from '@fortawesome/free-solid-svg-icons';
 import axios from "axios";
 
 const initialFormData = {
@@ -15,14 +18,13 @@ const initialFormData = {
     preexistingConditions: [],
 };
 
-
-
 const RegistrationForm = () => {
 
     const [formData, setFormData] = useState(initialFormData);
     const [countryOptions, setCountryOptions] = useState([]);
     const [cityOptions, setCityOptions] = useState([]);
     const [selectedCountry, setSelectedCountry] = useState('');
+    const [error, setError] = useState(null);
 
 
     useEffect(() => {
@@ -33,7 +35,7 @@ const RegistrationForm = () => {
                 );
                 setCountryOptions(response.data.geonames);
             } catch (error) {
-                console.log(error);
+                setError(error);
             }
         };
 
@@ -63,7 +65,7 @@ const RegistrationForm = () => {
                     a.localeCompare(b)
                 );      setCityOptions(sortedCities);
             } catch (error) {
-                console.log(error);
+                setError(error);
             }
         };
 
@@ -112,109 +114,119 @@ const RegistrationForm = () => {
                     return response.json();
                 }
             })
-            .then(error => console.log(error))
-            .catch(error => console.log(error))
+            .then(error =>setError(error))
+            .catch(error => setError(error))
     }
 
     return (
-        <div className="container">
-            <form onSubmit={handleSubmit} className="row g-3">
-                <div className="col-md-6">
-                    <label className="form-label">First Name:</label>
-                    <input type="text" name="firstName" onChange={handleChange} className="form-control" />
-                </div>
-                <div className="col-md-6">
-                    <label className="form-label">Last Name:</label>
-                    <input type="text" name="lastName" onChange={handleChange} className="form-control" />
-                </div>
-                <div className="col-12">
-                    <label className="form-label">Date of Birth:</label>
-                    <input type="date" name="dateOfBirth" onChange={handleChange} className="form-control" />
-                </div>
-                <div className="col-12">
-                    <label className="form-label">Address:</label>
-                    <input type="text" name="address" onChange={handleChange} className="form-control" />
-                </div>
-                <div className="col-md-6">
-                    <label className="form-label">Country:</label>
-                    <select name="country" value={selectedCountry} onChange={handleCountryChange} className="form-control">
-                        <option value="">Select a country</option>
-                        {countryOptions.map(country => (
-                            <option key={country.countryCode} value={country.countryCode}>{country.countryName}</option>
-                        ))}
-                    </select>
-                </div>
-                <div className="col-md-6">
-                    <label className="form-label">City:</label>
-                    <select name="city" onChange={handleChange} className="form-control">
-                        {cityOptions.length === 0 ? (
-                            <>
-                                <option value="">Please select a country first</option>
-                            </>
-                        ) : (
-                            <>
-                                <option value="">Select a city</option>
-                                {cityOptions.map((city, index) => (
-                                    <option key={index} value={city}>{city}</option>
-                                ))}
-                            </>
-                        )}
-                    </select>
-                </div>
+        <div className="d-flex justify-content-center">
+            <div className="container card mb-5 mt-5">
+                {error && error.length > 0 && (
+                    error.map((error, index) => (
+                        <div key={index} className="valid-error">
+                            {error}
+                        </div>
+                    ))
+                )}
+                <form onSubmit={handleSubmit} className="row g-3">
+                    <div className="title">Registration</div>
+                    <div className="col-md-6">
+                        <label className="form-label"><FontAwesomeIcon icon={faUser} /> First Name:</label>
+                        <input type="text" name="firstName" onChange={handleChange} className="form-control" />
+                    </div>
+                    <div className="col-md-6">
+                        <label className="form-label"><FontAwesomeIcon icon={faUser} /> Last Name:</label>
+                        <input type="text" name="lastName" onChange={handleChange} className="form-control" />
+                    </div>
+                    <div className="col-12">
+                        <label className="form-label"><FontAwesomeIcon icon={faCalendar} /> Date of Birth:</label>
+                        <input type="date" name="dateOfBirth" onChange={handleChange} className="form-control" />
+                    </div>
+                    <div className="col-12">
+                        <label className="form-label"><FontAwesomeIcon icon={faMapMarkerAlt} /> Address:</label>
+                        <input type="text" name="address" onChange={handleChange} className="form-control" />
+                    </div>
+                    <div className="col-md-6">
+                        <label className="form-label"><FontAwesomeIcon icon={faGlobe} /> Country:</label>
+                        <select name="country" value={selectedCountry} onChange={handleCountryChange} className="form-control">
+                            <option value="">Select a country</option>
+                            {countryOptions.map(country => (
+                                <option key={country.countryCode} value={country.countryCode}>{country.countryName}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="col-md-6">
+                        <label className="form-label"><FontAwesomeIcon icon={faCity} /> City:</label>
+                        <select name="city" onChange={handleChange} className="form-control">
+                            {cityOptions.length === 0 ? (
+                                <>
+                                    <option value="">Please select a country first</option>
+                                </>
+                            ) : (
+                                <>
+                                    <option value="">Select a city</option>
+                                    {cityOptions.map((city, index) => (
+                                        <option key={index} value={city}>{city}</option>
+                                    ))}
+                                </>
+                            )}
+                        </select>
+                    </div>
 
-                <div className="col-md-6">
-                    <label className="form-label">Zip Code:</label>
-                    <input type="text" name="zipCode" onChange={handleChange} className="form-control" />
-                </div>
-                <div className="col-md-6">
-                    <label className="form-label">Land Line:</label>
-                    <input type="text" name="landLine" onChange={handleChange} className="form-control" />
-                </div>
-                <div className="col-md-6">
-                    <label className="form-label">Cell Phone:</label>
-                    <input type="text" name="cellPhone" onChange={handleChange} className="form-control" />
-                </div>
-                <div className="col-12">
-                    <div className="form-check">
-                        <input type="checkbox" name="covidInfected" onChange={handleChange} className="form-check-input" />
-                        <label className="form-check-label">Covid Infected:</label>
+                    <div className="col-md-6">
+                        <label className="form-label"><FontAwesomeIcon icon={faEnvelope} /> Zip Code:</label>
+                        <input type="text" name="zipCode" onChange={handleChange} className="form-control" />
                     </div>
-                </div>
-                <div className="col-12">
-                    <label className="form-label">Preexisting Conditions:</label>
-                    <div className="form-check">
-                        <input type="checkbox" value="Diabetes" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
-                        <label className="form-check-label">Diabetes</label>
+                    <div className="col-md-6">
+                        <label className="form-label"><FontAwesomeIcon icon={faPhone} /> Land Line:</label>
+                        <input type="text" name="landLine" onChange={handleChange} className="form-control" />
                     </div>
-                    <div className="form-check">
-                        <input type="checkbox" value="Cardio-Vascular problems" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
-                        <label className="form-check-label">Cardio-Vascular problems</label>
+                    <div className="col-md-6">
+                        <label className="form-label"><FontAwesomeIcon icon={faPhone} /> Cell Phone:</label>
+                        <input type="text" name="cellPhone" onChange={handleChange} className="form-control" />
                     </div>
-                    <div className="form-check">
-                        <input type="checkbox" value="Allergies" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
-                        <label className="form-check-label">Allergies</label>
+                    <div className="col-12">
+                        <div className="form-check">
+                            <input type="checkbox" name="covidInfected" onChange={handleChange} className="form-check-input" />
+                            <label className="form-check-label"><FontAwesomeIcon icon={faVirus} /> Covid Infected:</label>
+                        </div>
                     </div>
-                    <div className="form-check">
-                        <input type="checkbox" value="Asthma" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
-                        <label className="form-check-label">Asthma</label>
+                    <div className="col-12 form-select">
+                        <label className="form-label"><FontAwesomeIcon icon={faHeartbeat} /> Preexisting Conditions:</label>
+                        <div className="form-check">
+                            <input type="checkbox" value="Diabetes" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
+                            <label className="form-check-label">Diabetes</label>
+                        </div>
+                        <div className="form-check">
+                            <input type="checkbox" value="Cardio-Vascular problems" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
+                            <label className="form-check-label">Cardio-Vascular problems</label>
+                        </div>
+                        <div className="form-check">
+                            <input type="checkbox" value="Allergies" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
+                            <label className="form-check-label">Allergies</label>
+                        </div>
+                        <div className="form-check">
+                            <input type="checkbox" value="Asthma" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
+                            <label className="form-check-label">Asthma</label>
+                        </div>
+                        <div className="form-check">
+                            <input type="checkbox" value="Cancer" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
+                            <label className="form-check-label">Cancer</label>
+                        </div>
+                        <div className="form-check">
+                            <input type="checkbox" value="HIV" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
+                            <label className="form-check-label">HIV</label>
+                        </div>
+                        <div className="form-check">
+                            <input type="checkbox" value="Other" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
+                            <label className="form-check-label">Other</label>
+                        </div>
                     </div>
-                    <div className="form-check">
-                        <input type="checkbox" value="Cancer" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
-                        <label className="form-check-label">Cancer</label>
+                    <div className="col-12">
+                        <button type="submit" className="btn">Submit</button>
                     </div>
-                    <div className="form-check">
-                        <input type="checkbox" value="HIV" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
-                        <label className="form-check-label">HIV</label>
-                    </div>
-                    <div className="form-check">
-                        <input type="checkbox" value="Other" name="preexistingConditions" onChange={handleChange} className="form-check-input" />
-                        <label className="form-check-label">Other</label>
-                    </div>
-                </div>
-                <div className="col-12">
-                    <button type="submit" className="btn btn-primary">Submit</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     );
 }
