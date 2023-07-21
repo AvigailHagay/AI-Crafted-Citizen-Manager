@@ -1,4 +1,4 @@
-import './navStyle.css';
+import '../style/navStyle.css';
 
 
 /**
