@@ -1,4 +1,4 @@
-# Citizens Registration Web Application
+# AI-Crafted Citizen Manager
 This web application allows citizens to register their information, including personal details and COVID-19-related information. It provides registration functionality and a summary page to view the registered citizens.
 
 
